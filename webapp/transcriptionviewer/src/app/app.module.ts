@@ -12,6 +12,7 @@ import { TranscriptionModule } from './transcription/transcription.module';
 import { NavigationComponent } from './navigation/navigation.component';
 import { SortByPipe } from './sort-by.pipe';
 import { HelpComponent } from './help/help.component';
+import { LoginComponent } from './auth/login/login.component';
 //import { UploadAudioComponent } from './transcription/containers/upload-audio/upload-audio.component';
 
 @NgModule({
@@ -19,7 +20,8 @@ import { HelpComponent } from './help/help.component';
     AppComponent,
     NavigationComponent,
     SortByPipe,
-    HelpComponent
+    HelpComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
