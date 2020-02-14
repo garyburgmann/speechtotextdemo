@@ -15,23 +15,24 @@ export class AccountService {
   constructor(
     private authService: AuthService
   ) {
-    const detailsFromStorage = JSON.parse(this.authService.getAccountDetails()) as AccountDetails;
-    if (detailsFromStorage !== null) {
-      this.Details = detailsFromStorage;
-      this.validateDetails();
-    } else {
-      // get details form auth service here!
-      this.Details = new AccountDetails();
-      this.authService.getAzureConfig()
-        .subscribe(
-          res => {
-            this.Details.load(res);
-            this.validateDetails();
-            this.$azureConfig.next(this.Details);
-          },
-          err => console.log(err)
-        )
-    }
+    // const detailsFromStorage = JSON.parse(this.authService.getAccountDetails()) as AccountDetails;
+    // if (detailsFromStorage !== null) {
+    //   this.Details = detailsFromStorage;
+    //   this.validateDetails();
+    // } else {
+      
+    // get details form auth service here!
+    this.Details = new AccountDetails();
+    this.authService.getAzureConfig()
+      .subscribe(
+        res => {
+          this.Details.load(res);
+          this.validateDetails();
+          this.$azureConfig.next(this.Details);
+        },
+        err => console.log(err)
+      )
+    // }
   }
 
   save() {
