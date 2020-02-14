@@ -20,9 +20,18 @@ export class TrancriptListComponent implements OnInit {
   timerHandle: number;
   detailsValid: boolean = false
   constructor(fileService: FileService, private transcriptService: TranscriptService, private accountService: AccountService, private _snackbar: MatSnackBar, private navService: NavigationService) {
-    if (this.accountService.IsSpeechValid.value) {
-      this.ngOnChange(this.accountService.Details);
-    }
+    // if (this.accountService.IsSpeechValid.value) {
+    //   this.ngOnChange(this.accountService.Details);
+    // }
+    this.accountService.$azureConfig
+      .subscribe(
+        res => {
+          if (this.accountService.IsSpeechValid.value) {
+            this.ngOnChange(res);
+          }
+        },
+        err => console.log(err)
+      )
     navService.NavTitle = ' - List'
 
   }

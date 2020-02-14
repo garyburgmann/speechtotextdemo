@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 // import * as CryptoJS from 'crypto-js';
 // import * as jwt from 'jsonwebtoken';
 import { Router } from '@angular/router';
@@ -30,47 +30,48 @@ export class AuthService {
     return localStorage.getItem('auth_token');
   }
 
-  public getAzureConfig(): any {
+  public getAzureConfig(): Observable<any> {
     let headers = new HttpHeaders({
       'Authorization': `Bearer ${this.getToken()}`
     });
-    this.http.get('http://localhost:8888/api/azure/config', { headers })
-      .toPromise()
-      .then((res:  any) => {
-        window.location.href=res.redirect_url;
-      })
-      .catch(e => console.log(e));
+    return this.http.get('http://localhost:8888/api/azure/config', { headers })
   }
   public redirect() {
     this.http.get('http://localhost:8888/api/auth/sso')
-      .toPromise()
-      .then((res:  any) => {
-        window.location.href=res.redirect_url;
-      })
-      .catch(e => console.log(e));
+      .subscribe(
+        (res: any) => {
+          window.location.href=res.redirect_url;
+        },
+        err => console.log(err)
+      );
   }
 
   public login(token: string) {
     const data = {'hello': 'world'};
     this.http.post('http://localhost:8888/api/auth/user', { token })
-      .toPromise()
-      .then((res:  any) => {
-        const user = res.s_number;
-        const token = res.token;
-        localStorage.setItem('auth_token', token);
-        localStorage.setItem('user', user);
-        console.log('login: ', user);
-        this.$user.next(user);
-        this.router.navigate(['/']);
-      })
-      .catch(e => console.log(e));   
+      .subscribe(
+        (res: any) => {
+          const user = res.s_number;
+          const token = res.token;
+          localStorage.setItem('auth_token', token);
+          localStorage.setItem('user', user);
+          this.$user.next(user);
+          this.router.navigate(['/']);
+        },
+        err => console.log(err)
+      )  
   }
 
   public logout() {
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('accountDetails');
     this.$user.next(null);
   }
-  
+
+  public getAccountDetails() {
+    return localStorage.getItem('accountDetails');
+  }
 }
   // validateToken(token: string): any {
   //   try {

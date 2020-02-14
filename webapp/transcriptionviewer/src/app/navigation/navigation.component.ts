@@ -16,7 +16,6 @@ export class NavigationComponent implements OnInit {
   ) {
     this.authService.$user.subscribe(user => {
       this.user = user;
-      console.log('DEBUG: NavigationComponent: user: ', user);
     })
   }
 

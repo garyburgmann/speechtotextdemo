@@ -29,34 +29,35 @@ export class StorageaccountDetailComponent implements OnInit {
     this.accountDetails = accountDetailsService.Details
     this.showAccountDetails = false;
     this.navService.MenuIcons = [
-      {
-        "icon": "lock",
-        "toolTip": this.showAccountDetailsLabel,"order":100,
-        "click": (icon) => {
-          this.toggleAccountDetails();
-          icon.icon = (this.showAccountDetails) ? 'minimize':'lock';
-          icon.toolTip = this.showAccountDetailsLabel
-        } 
-      },
+      // {
+      //   "icon": "lock",
+      //   "toolTip": this.showAccountDetailsLabel,"order":100,
+      //   "click": (icon) => {
+      //     this.toggleAccountDetails();
+      //     icon.icon = (this.showAccountDetails) ? 'minimize':'lock';
+      //     icon.toolTip = this.showAccountDetailsLabel
+      //   } 
+      // },
       {
         "toolTip": "Refresh",
         "icon": "refresh",
         "click": (icon)=> { this.refresh() } 
       }
     ];
-    if (!this.accountDetailsService.IsSpeechValid.value || !this.accountDetailsService.IsStorageValid.value) {
-      this.showAccountDetails = true;
-    }
+    // gary modified this to delliberately hide
+    // if (!this.accountDetailsService.IsSpeechValid.value || !this.accountDetailsService.IsStorageValid.value) {
+    //   this.showAccountDetails = true;
+    // }
     this.setShowAccountDetailsLabel();
     this.accountDetailsService.IsStorageValid.subscribe((value) => {
       if (!value) {
-        this.showAccountDetails = true;
-        this.selectedIndex = 0;//storage details
+        // this.showAccountDetails = true;
+        this.selectedIndex = 0;  //storage details
       }
     });
     this.accountDetailsService.IsSpeechValid.subscribe((value) => {
       if (!value) {
-        this.showAccountDetails = true;
+        // this.showAccountDetails = true;
         this.selectedIndex = 1;//speech details
       }
     });

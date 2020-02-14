@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AccountDetails } from './account-details'
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 
 @Injectable({
@@ -8,24 +8,34 @@ import { AuthService } from './auth/auth.service';
 })
 export class AccountService {
   Details: AccountDetails;
+  $azureConfig = new Subject<AccountDetails>();  // use this to notify transaction list to update
   IsStorageValid: BehaviorSubject<boolean> = new BehaviorSubject(false);
   IsSpeechValid: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
     private authService: AuthService
   ) {
-    let detailsFromStorage = JSON.parse(localStorage.getItem('accountDetails')) as AccountDetails;
+    const detailsFromStorage = JSON.parse(this.authService.getAccountDetails()) as AccountDetails;
     if (detailsFromStorage !== null) {
       this.Details = detailsFromStorage;
+      this.validateDetails();
     } else {
       // get details form auth service here!
       this.Details = new AccountDetails();
+      this.authService.getAzureConfig()
+        .subscribe(
+          res => {
+            this.Details.load(res);
+            this.validateDetails();
+            this.$azureConfig.next(this.Details);
+          },
+          err => console.log(err)
+        )
     }
-    this.validateDetails();
   }
 
   save() {
-    localStorage.setItem('accountDetails', JSON.stringify(this.Details));
+    // localStorage.setItem('accountDetails', JSON.stringify(this.Details));
     this.validateDetails();
   }
 
