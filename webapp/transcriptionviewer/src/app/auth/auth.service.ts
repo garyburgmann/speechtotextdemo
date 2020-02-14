@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Subject } from 'rxjs';
 // import * as CryptoJS from 'crypto-js';
 // import * as jwt from 'jsonwebtoken';
 import { Router } from '@angular/router';
@@ -10,7 +11,7 @@ import { Router } from '@angular/router';
 export class AuthService {
 
   // private secretKey = 'super-secret';
-  private user: any;
+  public $user = new Subject<string>();
 
   constructor(
     private http: HttpClient,
@@ -18,24 +19,33 @@ export class AuthService {
   ) { }
 
   public isAuthenticated(): boolean {
-    const token = localStorage.getItem('auth_token');
-
-    // key does not exist
-    if (token === null) {
-      return false;
-    }
-
-    this.user = this.validateToken(token);
-
-    console.log('isAuthenticated: ', this.user);
-    return this.user !== false;
+    const token = this.getToken();
+    const user = localStorage.getItem('user');
+    console.log('isAuthenticated: ', user, token);
+    this.$user.next(user);
+    return (token !== null && user !== null);
   }
 
+  public getToken(): string {
+    return localStorage.getItem('auth_token');
+  }
+
+  public getAzureConfig(): any {
+    let headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.getToken()}`
+    });
+    this.http.get('http://localhost:8888/api/azure/config', { headers })
+      .toPromise()
+      .then((res:  any) => {
+        window.location.href=res.redirect_url;
+      })
+      .catch(e => console.log(e));
+  }
   public redirect() {
     this.http.get('http://localhost:8888/api/auth/sso')
       .toPromise()
       .then((res:  any) => {
-        window.location.href=res.redirectUrl;
+        window.location.href=res.redirect_url;
       })
       .catch(e => console.log(e));
   }
@@ -45,10 +55,12 @@ export class AuthService {
     this.http.post('http://localhost:8888/api/auth/user', { token })
       .toPromise()
       .then((res:  any) => {
-        this.user = res;
-        const token = this.createToken(this.user);
+        const user = res.s_number;
+        const token = res.token;
         localStorage.setItem('auth_token', token);
-        console.log('login: ', this.user);
+        localStorage.setItem('user', user);
+        console.log('login: ', user);
+        this.$user.next(user);
         this.router.navigate(['/']);
       })
       .catch(e => console.log(e));   
@@ -56,26 +68,27 @@ export class AuthService {
 
   public logout() {
     localStorage.removeItem('auth_token');
-    this.user = null;
+    this.$user.next(null);
   }
+  
+}
+  // validateToken(token: string): any {
+  //   try {
+  //     // const decryptedToken = this.decrypt(token);
+  //     return JSON.parse(token);  // jwt.verify(token, this.secretKey);
+  //   } catch(err) {
+  //     return null;
+  //   }
+  // }
 
-  validateToken(token: string): any {
-    try {
-      // const decryptedToken = this.decrypt(token);
-      return JSON.parse(token);  // jwt.verify(token, this.secretKey);
-    } catch(err) {
-      return false;
-    }
-  }
-
-  createToken(user: any, expiresIn = 60 * 60): any {
-    try {
-      const token = JSON.stringify(user);  // jwt.sign(user, this.secretKey, { expiresIn });
-      return token;  // this.encrypt(token);
-    } catch(err) {
-      return false;
-    }
-  }
+  // createToken(user: any, expiresIn = 60 * 60): any {
+  //   try {
+  //     const token = JSON.stringify(user);  // jwt.sign(user, this.secretKey, { expiresIn });
+  //     return token;  // this.encrypt(token);
+  //   } catch(err) {
+  //     return false;
+  //   }
+  // }
 
   // encrypt(value: string): string {
   //   return CryptoJS.AES.encrypt(value, this.secretKey.trim()).toString();
@@ -84,4 +97,3 @@ export class AuthService {
   // decrypt(textToDecrypt: string): string {
   //   return CryptoJS.AES.decrypt(textToDecrypt, this.secretKey.trim()).toString(CryptoJS.enc.Utf8);
   // }
-}

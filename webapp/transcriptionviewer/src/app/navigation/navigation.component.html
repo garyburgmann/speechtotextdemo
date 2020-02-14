@@ -13,8 +13,10 @@
     <mat-icon *ngIf="icon.click" class="icon" matTooltip="{{icon.toolTip}}" (click)="[icon.click(icon)]">{{icon.icon}}
     </mat-icon>
   </ng-container>
+
   <mat-icon class="icon" [routerLink]="['/help']">help_outline</mat-icon>
+  <span *ngIf="user">{{ user }}</span>
   <mat-icon class="icon" [routerLink]="['/auth/login']">
-    {{ authService.isAuthenticated() ? "exit_to_app" : "account_circle" }}
+    {{ user ? "exit_to_app" : "account_circle" }}
   </mat-icon>
 </mat-toolbar>

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AccountDetails } from './account-details'
 import { BehaviorSubject } from 'rxjs';
+import { AuthService } from './auth/auth.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -8,19 +10,25 @@ export class AccountService {
   Details: AccountDetails;
   IsStorageValid: BehaviorSubject<boolean> = new BehaviorSubject(false);
   IsSpeechValid: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  constructor() {
+
+  constructor(
+    private authService: AuthService
+  ) {
     let detailsFromStorage = JSON.parse(localStorage.getItem('accountDetails')) as AccountDetails;
-    if (detailsFromStorage != null) {
+    if (detailsFromStorage !== null) {
       this.Details = detailsFromStorage;
     } else {
+      // get details form auth service here!
       this.Details = new AccountDetails();
     }
     this.validateDetails();
   }
+
   save() {
     localStorage.setItem('accountDetails', JSON.stringify(this.Details));
     this.validateDetails();
   }
+
   validateDetails() {
     if(!this.Details.RefreshRate){
       this.Details.RefreshRate = 30;

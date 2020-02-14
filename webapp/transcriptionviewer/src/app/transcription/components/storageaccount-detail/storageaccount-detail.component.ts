@@ -17,18 +17,33 @@ export class StorageaccountDetailComponent implements OnInit {
   accountDetails: AccountDetails;
   showAccountDetails: boolean;
   showAccountDetailsLabel: string = "Show Account Details";
-  selectedIndex: number = 0
-
-
+  selectedIndex: number = 0;
   //accountDetails:AccountDetails;
   locationOptions;
-  constructor(private accountDetailsService: AccountService, private navService: NavigationService) {
+
+  constructor(
+    private accountDetailsService: AccountService,
+    private navService: NavigationService
+  ) {
     this.locationOptions = Locations;
     this.accountDetails = accountDetailsService.Details
     this.showAccountDetails = false;
-    this.navService.MenuIcons = [{ "icon":"lock", "toolTip": this.showAccountDetailsLabel,"order":100, "click": (icon) => { this.toggleAccountDetails();icon.icon = (this.showAccountDetails) ?'minimize':'lock'; icon.toolTip = this.showAccountDetailsLabel } },
-    { "toolTip": "Refresh", "icon": "refresh","click":(icon)=>{this.refresh()} }
-  ];
+    this.navService.MenuIcons = [
+      {
+        "icon": "lock",
+        "toolTip": this.showAccountDetailsLabel,"order":100,
+        "click": (icon) => {
+          this.toggleAccountDetails();
+          icon.icon = (this.showAccountDetails) ? 'minimize':'lock';
+          icon.toolTip = this.showAccountDetailsLabel
+        } 
+      },
+      {
+        "toolTip": "Refresh",
+        "icon": "refresh",
+        "click": (icon)=> { this.refresh() } 
+      }
+    ];
     if (!this.accountDetailsService.IsSpeechValid.value || !this.accountDetailsService.IsStorageValid.value) {
       this.showAccountDetails = true;
     }
