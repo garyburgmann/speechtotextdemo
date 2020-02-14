@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  client:
+    build:
+      context: .
+    container_name: speech_to_text_client
+    volumes:
+      - ./src:/srv/src
+    ports:
+      - "4200:4200"
